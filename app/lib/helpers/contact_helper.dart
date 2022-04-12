@@ -9,7 +9,6 @@ const String phoneColumn = "phoneColumn";
 const String imgColumn = "imgColumn";
 
 class ContactHelper {
-
   static final ContactHelper _instance = ContactHelper.internal();
 
   factory ContactHelper() => _instance;
@@ -50,11 +49,11 @@ class ContactHelper {
         columns: [idColumn, nameColumn, emailColumn, phoneColumn, imgColumn],
         where: "$idColumn = ?",
         whereArgs: [id]);
-    if (maps.length > 0) {
+    if (maps.isNotEmpty) {
       return Contact.fromMap(maps.first);
     } else {
       // return null;
-      throw Exception('Error');
+      throw Exception('Errorzin');
     }
   }
 
@@ -70,33 +69,34 @@ class ContactHelper {
         whereArgs: [contact.id], where: "$idColumn = ?");
   }
 
-  Future<List> getAllContacts()async{
+  Future<List> getAllContacts() async {
     Database dbContact = await db;
     List listMap = await dbContact.rawQuery("SELECT * FROM $contactTable");
     List<Contact> listContact = [];
-    for(Map m in listMap){
+    for (Map m in listMap) {
       listContact.add(Contact.fromMap(m));
     }
     return listContact;
   }
 
-  Future<int?> getNumber()async{
+  Future<int?> getNumber() async {
     Database dbContact = await db;
-    return Sqflite.firstIntValue(await dbContact.rawQuery("SELECT COUNT(*) FROM $contactTable"));
+    return Sqflite.firstIntValue(
+        await dbContact.rawQuery("SELECT COUNT(*) FROM $contactTable"));
   }
 
-  Future close() async{
+  Future close() async {
     Database dbContact = await db;
     dbContact.close();
   }
 }
 
 class Contact {
-  late int id;
-  late String name;
-  late String email;
-  late String phone;
-  late String img;
+  int? id;
+  String? name;
+  String? email;
+  String? phone;
+  String? img;
 
   Contact();
 
@@ -105,7 +105,7 @@ class Contact {
     name = map[nameColumn];
     email = map[emailColumn];
     phone = map[phoneColumn];
-    img = map[img];
+    img = map[imgColumn];
   }
 
   Map<String, dynamic> toMap() {
