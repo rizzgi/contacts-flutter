@@ -2,6 +2,9 @@ import 'package:app/helpers/contact_helper.dart';
 import 'package:app/ui/contact_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:url_launcher/url_launcher.dart';
+
+enum OrderOptions { orderaz, orderza }
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -29,6 +32,21 @@ class _HomePageState extends State<HomePage> {
         title: const Text("Contatos"),
         backgroundColor: Colors.red,
         centerTitle: true,
+        actions: [
+          PopupMenuButton<OrderOptions>(
+            itemBuilder: (context) => <PopupMenuEntry<OrderOptions>>[
+              const PopupMenuItem<OrderOptions>(
+                child: Text("Ordenar de A a Z"),
+                value: OrderOptions.orderaz,
+              ),
+              const PopupMenuItem<OrderOptions>(
+                child: Text("Ordenar de Z a A"),
+                value: OrderOptions.orderza,
+              ),
+            ],
+            onSelected: _orderList,
+          )
+        ],
       ),
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
@@ -45,6 +63,22 @@ class _HomePageState extends State<HomePage> {
             return _contactCard(context, index);
           }),
     );
+  }
+
+  void _orderList(OrderOptions orderResult){
+    switch(orderResult){
+      case OrderOptions.orderaz:
+        contacts.sort((a,b){
+          return a.name!.toLowerCase().compareTo(b.name!.toLowerCase());
+        });
+        break;
+      case OrderOptions.orderza:
+        contacts.sort((a,b) {
+          return b.name!.toLowerCase().compareTo(a.name!.toLowerCase());
+        });
+        break;
+    }
+    setState(() {});
   }
 
   Widget _contactCard(BuildContext context, int index) {
@@ -112,7 +146,10 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: const EdgeInsets.all(10),
                         child: FlatButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              launch("tel:${contacts[index].phone}");
+                              Navigator.pop(context);
+                            },
                             child: const Text(
                               "Ligar",
                               style: TextStyle(color: Colors.red, fontSize: 20),
@@ -134,24 +171,33 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.all(10),
                         child: FlatButton(
                             onPressed: () {
-                              showDialog(context: context, builder: (context){
-                                return AlertDialog(
-                                  title: const Text("Descartar alteracoes?"),
-                                  content: const Text("Ao sair as informacoes serao perdidas"),
-                                  actions: [
-                                    FlatButton(onPressed: (){
-                                      Navigator.pop(context);
-                                    }, child: const Text("Cancelar")),
-                                    FlatButton(onPressed: (){
-                                      helper.deleteContact(contacts[index].id!);
-                                      setState(() {
-                                        contacts.removeAt(index);
-                                        Navigator.pop(context);
-                                      });
-                                    }, child: const Text("Confirmar")),
-                                  ],
-                                );
-                              });
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title:
+                                          const Text("Descartar alteracoes?"),
+                                      content: const Text(
+                                          "Ao sair as informacoes serao perdidas"),
+                                      actions: [
+                                        FlatButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text("Cancelar")),
+                                        FlatButton(
+                                            onPressed: () {
+                                              helper.deleteContact(
+                                                  contacts[index].id!);
+                                              setState(() {
+                                                contacts.removeAt(index);
+                                                Navigator.pop(context);
+                                              });
+                                            },
+                                            child: const Text("Confirmar")),
+                                      ],
+                                    );
+                                  });
                             },
                             child: const Text(
                               "Excluir",

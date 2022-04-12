@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:app/helpers/contact_helper.dart';
 import 'package:flutter/material.dart';
-
+import 'package:image_picker/image_picker.dart';
 class ContactPage extends StatefulWidget {
   final Contact? contact;
 
@@ -54,11 +54,11 @@ class _ContactPageState extends State<ContactPage> {
                 FocusScope.of(context).requestFocus(_nameFocus);
               }
             },
-            child: Icon(Icons.save),
+            child: const Icon(Icons.save),
             backgroundColor: Colors.red,
           ),
           body: SingleChildScrollView(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             child: Column(
               children: [
                 GestureDetector(
@@ -74,11 +74,19 @@ class _ContactPageState extends State<ContactPage> {
                                   as ImageProvider),
                     ),
                   ),
+                  onTap: () async {
+                    await ImagePicker().pickImage(source: ImageSource.camera).then((file){
+                      if(file == null) return;
+                      setState(() {
+                        _editedContact.img = file.path;
+                      });
+                    });
+                  },
                 ),
                 TextField(
                   controller: _nameController,
                   focusNode: _nameFocus,
-                  decoration: InputDecoration(labelText: "Nome:"),
+                  decoration: const InputDecoration(labelText: "Nome:"),
                   onChanged: (text) {
                     _userEdited = true;
                     setState(() {
@@ -88,7 +96,7 @@ class _ContactPageState extends State<ContactPage> {
                 ),
                 TextField(
                   controller: _emailController,
-                  decoration: InputDecoration(labelText: "Email:"),
+                  decoration: const InputDecoration(labelText: "Email:"),
                   onChanged: (text) {
                     _userEdited = true;
                     _editedContact.email = text;
@@ -97,7 +105,7 @@ class _ContactPageState extends State<ContactPage> {
                 ),
                 TextField(
                   controller: _phoneController,
-                  decoration: InputDecoration(labelText: "Número:"),
+                  decoration: const InputDecoration(labelText: "Número:"),
                   onChanged: (text) {
                     _userEdited = true;
                     _editedContact.phone = text;
@@ -115,16 +123,16 @@ class _ContactPageState extends State<ContactPage> {
     if(_userEdited){
       showDialog(context: context, builder: (context){
         return AlertDialog(
-          title: Text("Descartar alteracoes?"),
-          content: Text("Ao sair as informacoes serao perdidas"),
+          title: const Text("Descartar alteracoes?"),
+          content: const Text("Ao sair as informacoes serao perdidas"),
           actions: [
             FlatButton(onPressed: (){
               Navigator.pop(context);
-            }, child: Text("Cancelar")),
+            }, child: const Text("Cancelar")),
             FlatButton(onPressed: (){
               Navigator.pop(context);
               Navigator.pop(context);
-            }, child: Text("Confirmar")),
+            }, child:const Text("Confirmar")),
           ],
         );
       });
