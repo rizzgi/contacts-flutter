@@ -92,9 +92,77 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       onTap: () {
-        _showContactPage(contact: contacts[index]);
+        _showOptions(context, index);
       },
     );
+  }
+
+  void _showOptions(BuildContext context, int index) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return BottomSheet(
+              onClosing: () {},
+              builder: (context) {
+                return Container(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: FlatButton(
+                            onPressed: () {},
+                            child: const Text(
+                              "Ligar",
+                              style: TextStyle(color: Colors.red, fontSize: 20),
+                            )),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: FlatButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              _showContactPage(contact: contacts[index]);
+                            },
+                            child: const Text(
+                              "Editar",
+                              style: TextStyle(color: Colors.red, fontSize: 20),
+                            )),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: FlatButton(
+                            onPressed: () {
+                              showDialog(context: context, builder: (context){
+                                return AlertDialog(
+                                  title: const Text("Descartar alteracoes?"),
+                                  content: const Text("Ao sair as informacoes serao perdidas"),
+                                  actions: [
+                                    FlatButton(onPressed: (){
+                                      Navigator.pop(context);
+                                    }, child: const Text("Cancelar")),
+                                    FlatButton(onPressed: (){
+                                      helper.deleteContact(contacts[index].id!);
+                                      setState(() {
+                                        contacts.removeAt(index);
+                                        Navigator.pop(context);
+                                      });
+                                    }, child: const Text("Confirmar")),
+                                  ],
+                                );
+                              });
+                            },
+                            child: const Text(
+                              "Excluir",
+                              style: TextStyle(color: Colors.red, fontSize: 20),
+                            )),
+                      ),
+                    ],
+                  ),
+                );
+              });
+        });
   }
 
   void _showContactPage({Contact? contact}) async {
